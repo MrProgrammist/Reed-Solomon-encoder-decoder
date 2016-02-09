@@ -1,7 +1,7 @@
 # Reed-Solomon-encoder-decoder
 This is the simple example of Reed-Solomon encoder and decoder with Qt
 
-The program uses a tabular method of coding.
+The program uses a tabular method of encoding.
 
 You can see GUI examples using the links below:
 
@@ -13,3 +13,5 @@ https://cloud.githubusercontent.com/assets/17139703/12918311/90124972-cf4f-11e5-
 
 Distortion of four bits in the channel and Correction at the receiver with errors:
 https://cloud.githubusercontent.com/assets/17139703/12918313/92638dc6-cf4f-11e5-80a9-8f7b0b3dd151.png
+
+Please, read the comments in the "widget.cpp" file.
