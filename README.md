@@ -5,7 +5,6 @@ The program uses a tabular method of coding.
 
 You can see GUI examples using the links below:
 
-https://cloud.githubusercontent.com/assets/17139703/12913745/9cef8434-cf31-11e5-91d4-308133683aae.png
-https://cloud.githubusercontent.com/assets/17139703/12913750/a0634ba0-cf31-11e5-9165-b6c934681f8a.png
-https://cloud.githubusercontent.com/assets/17139703/12913753/a228cf46-cf31-11e5-9c75-8151a8429ac2.png
-https://cloud.githubusercontent.com/assets/17139703/12913754/a3d6d87e-cf31-11e5-97fa-1cfd4888545a.png
+https://cloud.githubusercontent.com/assets/17139703/12918308/8bc5c484-cf4f-11e5-911d-dbf264354a32.png
+https://cloud.githubusercontent.com/assets/17139703/12918311/90124972-cf4f-11e5-85de-b4197a31839a.png
+https://cloud.githubusercontent.com/assets/17139703/12918313/92638dc6-cf4f-11e5-80a9-8f7b0b3dd151.png
