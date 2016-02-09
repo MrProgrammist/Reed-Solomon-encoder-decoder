@@ -1,5 +1,5 @@
 # Reed-Solomon-encoder-decoder
-This is simple example of Reed-Solomon encoder and decoder with Qt
+This is the simple example of Reed-Solomon encoder and decoder with Qt
 
 The program uses a tabular method of coding.
 
