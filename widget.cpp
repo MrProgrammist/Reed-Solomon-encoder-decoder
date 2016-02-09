@@ -7,14 +7,12 @@ Widget::Widget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-//    Заполняем таблицу соответствия входным комбинациям G(x)
-//    выходых комбинаций F(x). По данной таблице кодер определяет
-//    выходную кодовую комбинацию F(x) по входным данным G(x), а декодер -
-//    выходные данные G'(x) по кодовой комбинации H(x), полученной из канала связи
-//    таблица представляет собой двумерный массив 16-разрядных ячеек, идущих парами
-//    в первых ячейках пар хранятся все варианты 5-разрядных кодовых слов, которые могут
-//    поступить от ООД, а во вторых ячейках пар, - соответствующие им 15-разрядные кодовые
-//    комбинации
+//	checkTable is the Lookup table that contains the correspondence between the input (G(X)) of 
+//	the encoder values and the corresponding output (F(X)) values. The decoder also uses this table
+//	to get the original data (G'(X)) from the received code blocks (H(X)). For example, if sender puts to encoder
+//	combination "0b10100", encoder checks the contents of the first cell of each pair. 
+//	If the contents of the first cell corresponds to an input combination, encoder gets value of thhe second cell (combination "0b101001010100101")
+
     checkTable[0][0] = 0b00000;
     checkTable[0][1] = 0b000000000000000;
     checkTable[1][0] = 0b10000;
@@ -80,9 +78,7 @@ Widget::Widget(QWidget *parent) :
     checkTable[31][0] = 0b11111;
     checkTable[31][1] = 0b111110110111110;
 
-//    Производим начальную инициализацию полей формы и значений переменных
-//    для корректной работы программы. Избыточные биты в кодах маркируются
-//    зеленым цветом
+//	The Main form and variables initialization
 
     ui->labelCoder->setText("00000<font color=\"green\">0000000000<\font>");
     ui->labelDecoder->setText("00000<font color=\"green\">0000000000<\font>");
@@ -92,8 +88,9 @@ Widget::Widget(QWidget *parent) :
     dataAfterDecoder = 0;
     dataAfterDistortion = 0;
 
-//    Подключаем события нажатия на кнопки, соответствующие битам G(x) и E(x)
-//    к функции-обработчику данных событий
+//	Connect buttons' "clicked" events to appropriate event handlers
+//	Each button is the one bit that can change its state when you click.
+//  E(X) - the set of buttons with it is possible to change bits of coded block to emulate channel errors.
 
     connect(ui->buttonG0, SIGNAL(clicked()), this, SLOT(buttonClicked()));
     connect(ui->buttonG1, SIGNAL(clicked()), this, SLOT(buttonClicked()));
@@ -123,13 +120,10 @@ Widget::~Widget()
     delete ui;
 }
 
-//buttonClicked() - функция-обработчик событий нажатия на кнопки, соответствующие битам G(x) и E(x)
-//В функции, с помощью процедуры динамического приведения типов(dynamic_cast), получается указатель на объект кнопки
-//которая была нажата. С помощью данного указателя можем получать информацию о кнопке. Далее считывается текущее
-//название кнопки ("0" или "1") и изменяется на противоположное. Таким образом создается переключение битов из 1 в 0
-//и наоборот. После этого последовательно вызываются функции coding(), distortion(), decoding(), showResult().
-//Таким образом, при нажатии любой из кнопок, соответствующих битам G(x) и E(x), выполняется процедура
-//кодирования/декодирования
+//	buttonClicked() - the handler to buttons' "clicked" events. 
+//	This function used dynamic_cast to get pointer to QPushButton object from pointer to QObject, received from sender.
+//	Now we can invert state of bit and perform encoding and decoding procedures.
+
 void Widget::buttonClicked()
 {
     QPushButton *button = dynamic_cast<QPushButton *>(sender());
@@ -148,14 +142,9 @@ void Widget::buttonClicked()
     showResult();
 }
 
-//coding() - функция, отвечающая за кодирование набранной кнопками комбинации G(x) с помощью табличного метода
-//функция считывает значения кнопок, соответствующих 5-разрядному слову, кторое нужно закодирывать и преобразует
-//эти значения в 16-разрядную переменную userData. Таким образом, значение переменной userData соответствует числу,
-//набранному кнопками. Далее это число прогоняется по таблице checkTable. Как уже упоминалось выше, вся таблица
-//состоит из пар чисел. Первое число в каждой паре, - один из вариантов данных, пришедших от пользователя,
-//второе число - соответствующая этим данным кодовая комбинация. Найдя пару, в которой первое число совпадает
-//с данными, полученными от пользователя, кодер берет значение второго числа пары и выдает его на выход
-//Это и есть код F(x). Данное значение записывается в переменную dataAfterCoder
+//	The coding() function perform encoding using lookup table (obtain F(X) from G(X)).
+//	Coded block is saved to dataAfterCoder variable
+
 void Widget::coding()
 {
     userData = 0;
@@ -181,13 +170,11 @@ void Widget::coding()
     }
 }
 
-//distortion() - функция, которая вносит искажения E(x) в кодовую комбинацию F(x) и выдает
-//искаженную кодовую комбинацию H(x) на декодер. Функция последовательно проверяет значения
-//кнопок, соответствующих поиному искажения E(x), вносимого каналом связи. Каждая кнопка отвечает
-//за искажение в одном из 15 разрядов кодовой комбинации F(x). Если значение кнопки соответствует
-//"1" (есть искажение),соответствующий этой кнопк бит кодовой комбинации F(x), сохраненной в переменной
-//dataAfterCoder, инвертируется операцией "сложение по модулю 2". Полученная таким образом искаженная
-//кодовая комбинация H(x) сохраняется в переменной dataAfterDistortion
+
+// distortion() - used to change coded block bits in accordance with E(X) combination. Each bit of
+// E(X) that is in state "1" points to position in coded block at which the error occurred.
+// To change bit states we use the "XOR" operation. The result is in dataAfterDistortion variable.
+
 void Widget::distortion()
 {
     quint16 distortedData = dataAfterCoder;
@@ -240,20 +227,9 @@ void Widget::distortion()
     dataAfterDistortion = distortedData;
 }
 
-//decoding() - функция, осуществляющая декодирование, то есть преобразование принятой из
-//канала связи кодовой комбинации H(x) в блок данных G'(x), соответствующий передаваемым с удаленного
-//конца данным G(x). Функция извлекает значение переменной dataAfterDistortion, соответствующей
-//кодовой информации, принятой из канала связи и по нему осуществляет декодирование табличным способом.
-//Процедура декодирования очень похожа на процедуру кодирования, за исключением некоторых особенностей.
-//Получив данные из канала связи, функция обращается к парам данных проверочной таблицы. В каждой паре
-//первое число - одна из возможных комбинаций пользовательских данных, второе - соответствующая ей кодовая
-//комбинация, образованная кодом (15, 5). Пробегая по всем парам таблицы, функция сравнивает принятую
-//кодовую комбинацию с значением второго числа пары. Процедура сравнения заключается в определении количества
-//разрядов, в которых принятая кодовая комбинация отличается от кодовой комбинации, записанной в таблице и
-//представленной соответствующей парой данные-код. Во время просмотра всей таблицы функция декодирования
-//находит ту пару чисел, в которой второе число имеет минимальное число разрядов, отличных от приятой
-//кодовой комбинации H(x). Первое число в данной паре есть ни что иное, как декодированные данные, которые
-//необходимо передать пользователю. Эти данные сохраняются в переменной dataAfterDecoder
+//	decoding() function uses checkTable to decode received block H(X). To find original data
+//	in table the minimum distance between received block and blocks in the table is calculated.
+
 void Widget::decoding()
 {
     quint16 data = 0;
@@ -285,12 +261,10 @@ void Widget::decoding()
     dataAfterDecoder =  checkTable[resultIndex][0];
 }
 
-//showResult() - функция, отвечающее за отображение данных^ полученных в ходе рассчетов
-//функциями coding(), distortion() и decoding(), на форме приложения
-//Функция подсвечивает избыточные данные, добавляемые кодером, зеленым цветом.
-//Так же функция подсвечивает красным цветом искаженные биты в кодовой комбинации H(x),
-//получаемой из канала связи и ошибочные биты данных G'(x), получпемых на выходе декодера в случае,
-//если последний не смог исправить все ошибки в принятой из канала связи кодовой комбинации
+//	The showResult() function is used to display bit sequences in label elements of ui.
+//	Redundant bits are shown in green
+//	Bits with errors are displayed in red
+
 void Widget::showResult()
 {
     QString strDataAfterCoder = QString::number(dataAfterCoder, 2);
